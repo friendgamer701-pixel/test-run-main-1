@@ -8,7 +8,7 @@ import {
 import {
   Sidebar, SidebarProvider, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarHeader, SidebarFooter, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Home, List, BarChart3, Shield, Activity } from 'lucide-react';
+import { Home, List, BarChart3, Shield } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,13 +26,14 @@ interface MonthlyReportData {
 }
 
 interface CategoryDistributionData {
-  category: string;
+  name: string;
   count: number;
+  fill: string;
 }
 
-interface ResolutionTimeData {
-  category: string;
-  avg_time_hours: number;
+interface ReportsByDayData {
+  day: string;
+  count: number;
 }
 
 interface LocationHotspotData {
@@ -63,7 +64,6 @@ const MonthlyReportsChart = ({ data }: { data: MonthlyReportData[] }) => (
 
 const CategoryDistributionChart = ({ data }: { data: CategoryDistributionData[] }) => {
   const isMobile = useIsMobile();
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF", "#FF1943"];
   return (
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
@@ -75,20 +75,20 @@ const CategoryDistributionChart = ({ data }: { data: CategoryDistributionData[] 
           outerRadius={isMobile ? 60 : 80}
           fill="#8884d8"
           dataKey="count"
-          nameKey="category"
+          nameKey="name"
           label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
             const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
             const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
             const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
             return (
               <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-                {`${(percent * 100).toFixed(0)}%`}
+                {`%${(percent * 100).toFixed(0)}`}
               </text>
             );
           }}
         >
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell key={`cell-${index}`} fill={entry.fill} />
           ))}
         </Pie>
         <Tooltip />
@@ -98,31 +98,49 @@ const CategoryDistributionChart = ({ data }: { data: CategoryDistributionData[] 
   );
 };
 
-const ResolutionTimeChart = ({ data }: { data: ResolutionTimeData[] }) => (
-  <ResponsiveContainer width="100%" height={300}>
-    <BarChart data={data} layout="vertical">
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis type="number" />
-      <YAxis dataKey="category" type="category" width={100} />
-      <Tooltip formatter={(value) => `${Number(value).toFixed(2)} hours`} />
-      <Legend />
-      <Bar dataKey="avg_time_hours" fill="#8884d8" name="Average Resolution Time (hours)" />
-    </BarChart>
-  </ResponsiveContainer>
-);
+const ReportsByDayChart = ({ data }: { data: ReportsByDayData[] }) => {
+  const isMobile = useIsMobile();
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF", "#FF1943", "#8884d8"];
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart data={data} margin={isMobile ? { top: 5, right: 20, left: -20, bottom: 5 } : { top: 5, right: 30, left: 20, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="day" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="count" name="Number of Reports" radius={[4, 4, 0, 0]}>
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+};
 
-const LocationHotspotsChart = ({ data }: { data: LocationHotspotData[] }) => (
-  <ResponsiveContainer width="100%" height={300}>
-    <BarChart data={data}>
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="location" />
-      <YAxis />
-      <Tooltip />
-      <Legend />
-      <Bar dataKey="count" fill="#FF8042" name="Number of Reports" />
-    </BarChart>
-  </ResponsiveContainer>
-);
+const LocationHotspotsChart = ({ data }: { data: LocationHotspotData[] }) => {
+  const isMobile = useIsMobile();
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart data={data} margin={isMobile ? { top: 5, right: 20, left: -20, bottom: 5 } : { top: 5, right: 30, left: 20, bottom: 5 }}>
+        <defs>
+          <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#FF8042" stopOpacity={0.8}/>
+            <stop offset="95%" stopColor="#FF8042" stopOpacity={0}/>
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="location" />
+        <YAxis />
+        <Tooltip contentStyle={{ background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(5px)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '10px' }} />
+        <Legend />
+        <Bar dataKey="count" fill="url(#colorUv)" name="Number of Reports" radius={[10, 10, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
 
 // Custom Tooltip for detailed view
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -141,15 +159,17 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 const AnalyticsContent = () => {
   const [monthlyData, setMonthlyData] = useState<MonthlyReportData[]>([]);
   const [categoryData, setCategoryData] = useState<CategoryDistributionData[]>([]);
-  const [resolutionTimeData, setResolutionTimeData] = useState<ResolutionTimeData[]>([]);
+  const [reportsByDayData, setReportsByDayData] = useState<ReportsByDayData[]>([]);
   const [locationData, setLocationData] = useState<LocationHotspotData[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF", "#FF1943"];
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const { data: issues, error } = await supabase.from('issues').select('*');
+      const { data: issues, error } = await supabase.from('issues').select<'*', Issue>('*');
       
       if (error || !issues) {
         console.error("Error fetching issues:", error);
@@ -160,7 +180,7 @@ const AnalyticsContent = () => {
       // Process data for each chart
       processMonthlyReports(issues);
       processCategoryDistribution(issues);
-      processResolutionTimes(issues);
+      processReportsByDay(issues);
       processLocationHotspots(issues);
       
       setLoading(false);
@@ -187,31 +207,29 @@ const AnalyticsContent = () => {
   const processCategoryDistribution = (issues: Issue[]) => {
     const data = issues.reduce((acc, issue) => {
       if (!acc[issue.category]) {
-        acc[issue.category] = { category: issue.category, count: 0 };
+        acc[issue.category] = { name: issue.category, count: 0, fill: '' };
       }
       acc[issue.category].count++;
       return acc;
     }, {} as Record<string, CategoryDistributionData>);
-    setCategoryData(Object.values(data));
+    
+    const sortedData = Object.values(data).sort((a,b) => b.count - a.count).map((item, index) => ({...item, fill: COLORS[index % COLORS.length]}));
+    setCategoryData(sortedData);
   };
 
-  const processResolutionTimes = (issues: Issue[]) => {
-    const resolvedIssues = issues.filter(i => i.status === 'resolved' && i.resolved_at);
-    const dataByCategory = resolvedIssues.reduce((acc, issue) => {
-      if (!acc[issue.category]) {
-        acc[issue.category] = { total_time: 0, count: 0 };
-      }
-      const timeDiff = new Date(issue.resolved_at!).getTime() - new Date(issue.created_at).getTime();
-      acc[issue.category].total_time += timeDiff / (1000 * 60 * 60); // in hours
-      acc[issue.category].count++;
-      return acc;
-    }, {} as Record<string, { total_time: number; count: number }>);
+  const processReportsByDay = (issues: Issue[]) => {
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const data = issues.reduce((acc, issue) => {
+        const day = daysOfWeek[new Date(issue.created_at).getDay()];
+        if (!acc[day]) {
+            acc[day] = { day, count: 0 };
+        }
+        acc[day].count++;
+        return acc;
+    }, {} as Record<string, ReportsByDayData>);
 
-    const avgData = Object.keys(dataByCategory).map(category => ({
-      category,
-      avg_time_hours: dataByCategory[category].total_time / dataByCategory[category].count,
-    }));
-    setResolutionTimeData(avgData);
+    const sortedData = daysOfWeek.map(day => data[day] || { day, count: 0 });
+    setReportsByDayData(sortedData);
   };
 
   const processLocationHotspots = (issues: Issue[]) => {
@@ -305,10 +323,10 @@ const AnalyticsContent = () => {
 
               <Card style={chartCardStyle}>
                 <CardHeader>
-                  <CardTitle>Average Resolution Time by Category</CardTitle>
+                  <CardTitle>Reports by Day of the Week</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ResolutionTimeChart data={resolutionTimeData} />
+                  <ReportsByDayChart data={reportsByDayData} />
                 </CardContent>
               </Card>
             </div>
