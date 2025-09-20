@@ -1,13 +1,5 @@
 import React from "react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator
-} from "@/components/ui/dropdown-menu";
-import {
   Sidebar,
   SidebarProvider,
   SidebarMenu,
@@ -21,10 +13,10 @@ import {
   SidebarGroupLabel,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Home, List, BarChart3, LogOut, Shield, Settings, User as UserIcon, Activity } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Home, List, BarChart3, Shield, Activity } from 'lucide-react';
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { useNavigate } from "react-router-dom";
+import { UserMenu } from "@/components/UserMenu";
 
 const AdminDashboardContent: React.FC = () => {
   const navigate = useNavigate();
@@ -38,9 +30,9 @@ const AdminDashboardContent: React.FC = () => {
     <>
       <Sidebar variant="inset" collapsible="icon">
         <SidebarHeader>
-          <div className="flex items-center gap-2">
-            <Shield className="w-6 h-6 text-primary" />
-            <span className="text-lg font-semibold">CiviLink</span>
+          <div className="flex items-center gap-3 p-2">
+            <Shield className="w-8 h-8 text-primary" />
+            <span className="text-2xl font-semibold">CiviLink</span>
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -48,58 +40,28 @@ const AdminDashboardContent: React.FC = () => {
             <SidebarGroupLabel>Main</SidebarGroupLabel>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Dashboard" isActive>
-                  <Home className="w-4 h-4" />
-                  Dashboard
+                <SidebarMenuButton tooltip="Dashboard" isActive className="h-12 hover:scale-105 hover:shadow-lg transition-transform duration-200">
+                  <Home className="w-5 h-5" />
+                  <span className="text-base">Dashboard</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton tooltip="All Reports" onClick={() => navigate('/admin/issues')}>
-                  <List className="w-4 h-4" />
-                  All Reports
+                <SidebarMenuButton tooltip="All Reports" onClick={() => navigate('/admin/issues')} className="h-12 hover:scale-105 hover:shadow-lg transition-transform duration-200">
+                  <List className="w-5 h-5" />
+                  <span className="text-base">All Reports</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Analytics" onClick={() => navigate('/admin/analytics')}>
-                  <BarChart3 className="w-4 h-4" />
-                  Analytics
+                <SidebarMenuButton tooltip="Analytics" onClick={() => navigate('/admin/analytics')} className="h-12 hover:scale-105 hover:shadow-lg transition-transform duration-200">
+                  <BarChart3 className="w-5 h-5" />
+                  <span className="text-base">Analytics</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-2 cursor-pointer p-2 rounded-md hover:bg-muted">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                  <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">Admin User</span>
-                  <span className="text-xs text-muted-foreground">admin@CiviLink.com</span>
-                </div>
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 mb-2" side="top" align="start">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <UserIcon className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <UserMenu />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>

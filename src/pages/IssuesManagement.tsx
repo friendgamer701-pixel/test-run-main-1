@@ -357,32 +357,39 @@ const IssuesManagement = () => {
       <div className="min-h-screen bg-muted/40 p-4 sm:p-6">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center justify-between mb-4">
             <Button 
-              variant="ghost" 
+              variant="outline" 
               onClick={() => navigate('/admin')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:shadow-lg hover:scale-105 transition-transform duration-200"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Dashboard
             </Button>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2">
-                <Activity className="h-8 w-8 text-primary" />
-                Issues Management
-              </h1>
-              <p className="text-muted-foreground">Comprehensive issue tracking and management system</p>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>Live Updates</span>
+            <div className="bg-gray-100 rounded-md px-3 py-1.5">
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                <span className="text-sm font-medium text-muted-foreground">Live Updates</span>
               </div>
             </div>
           </div>
+          
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold flex items-center gap-3">
+                    <Activity className="h-8 w-8 text-primary" />
+                    Issues Management
+                  </h1>
+                  <p className="text-muted-foreground mt-1">Comprehensive issue tracking and management system</p>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
         </div>
 
         {/* Statistics Cards */}

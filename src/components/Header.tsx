@@ -35,7 +35,7 @@ export const Header = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-2">
-            <img src="public/logo.png" width="32" ></img>
+            <img src="src/assets/logo.png" width="32" ></img>
               CiviLink
             </Link>
             

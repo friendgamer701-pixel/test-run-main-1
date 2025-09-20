@@ -1,4 +1,4 @@
-export type Json =
+export type Json = 
   | string
   | number
   | boolean
@@ -64,6 +64,7 @@ export type Database = {
           street_address: string | null
           title: string
           upvotes_count: number | null
+          resolved_at: string | null
         }
         Insert: {
           assigned_to?: string | null
@@ -85,6 +86,7 @@ export type Database = {
           street_address?: string | null
           title: string
           upvotes_count?: number | null
+          resolved_at?: string | null
         }
         Update: {
           assigned_to?: string | null
@@ -106,6 +108,7 @@ export type Database = {
           street_address?: string | null
           title?: string
           upvotes_count?: number | null
+          resolved_at?: string | null
         }
         Relationships: [
           {

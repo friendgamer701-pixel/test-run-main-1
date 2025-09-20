@@ -6,31 +6,18 @@ import {
   Card, CardContent, CardHeader, CardTitle
 } from "@/components/ui/card";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator
-} from "@/components/ui/dropdown-menu";
-import {
   Sidebar, SidebarProvider, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarHeader, SidebarFooter, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Home, List, BarChart3, LogOut, Shield, Settings, User as UserIcon, Activity } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Home, List, BarChart3, Shield, Activity } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useIsMobile } from "@/hooks/use-mobile";
+import type { Tables } from "@/integrations/supabase/types";
+import { UserMenu } from "@/components/UserMenu";
 
 // Types for our data
-interface Issue {
-  id: number;
-  category: string;
-  status: string;
-  created_at: string;
-  resolved_at: string | null;
-  location_name: string | null;
-}
+type Issue = Tables<"issues">;
 
 interface MonthlyReportData {
   month: string;
@@ -75,6 +62,7 @@ const MonthlyReportsChart = ({ data }: { data: MonthlyReportData[] }) => (
 );
 
 const CategoryDistributionChart = ({ data }: { data: CategoryDistributionData[] }) => {
+  const isMobile = useIsMobile();
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF", "#FF1943"];
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -84,7 +72,7 @@ const CategoryDistributionChart = ({ data }: { data: CategoryDistributionData[] 
           cx="50%"
           cy="50%"
           labelLine={false}
-          outerRadius={80}
+          outerRadius={isMobile ? 60 : 80}
           fill="#8884d8"
           dataKey="count"
           nameKey="category"
@@ -104,7 +92,7 @@ const CategoryDistributionChart = ({ data }: { data: CategoryDistributionData[] 
           ))}
         </Pie>
         <Tooltip />
-        <Legend />
+        <Legend wrapperStyle={isMobile ? { fontSize: '0.7rem', whiteSpace: 'normal' } : {}} />
       </PieChart>
     </ResponsiveContainer>
   );
@@ -163,7 +151,7 @@ const AnalyticsContent = () => {
       setLoading(true);
       const { data: issues, error } = await supabase.from('issues').select('*');
       
-      if (error) {
+      if (error || !issues) {
         console.error("Error fetching issues:", error);
         setLoading(false);
         return;
@@ -238,6 +226,14 @@ const AnalyticsContent = () => {
     setLocationData(Object.values(data).sort((a,b) => b.count - a.count).slice(0, 10)); // Top 10
   };
 
+  const chartCardStyle = {
+    background: 'rgba(255, 255, 255, 0.1)',
+    backdropFilter: 'blur(10px)',
+    borderRadius: '10px',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+  };
+
   if (loading) return (
     <div className="flex items-center justify-center h-full">
       <div>Loading analytics...</div>
@@ -248,9 +244,9 @@ const AnalyticsContent = () => {
     <>
       <Sidebar variant="inset" collapsible="icon">
         <SidebarHeader>
-          <div className="flex items-center gap-2">
-            <Shield className="w-6 h-6 text-primary" />
-            <span className="text-lg font-semibold">CiviLink</span>
+          <div className="flex items-center gap-3 p-2">
+            <Shield className="w-8 h-8 text-primary" />
+            <span className="text-2xl font-semibold">CiviLink</span>
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -258,58 +254,28 @@ const AnalyticsContent = () => {
             <SidebarGroupLabel>Main</SidebarGroupLabel>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Dashboard" onClick={() => navigate('/admin')}>
-                  <Home className="w-4 h-4" />
-                  Dashboard
+                <SidebarMenuButton tooltip="Dashboard" onClick={() => navigate('/admin')} className="h-12 hover:scale-105 hover:shadow-lg transition-transform duration-200">
+                  <Home className="w-5 h-5" />
+                  <span className="text-base">Dashboard</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton tooltip="All Reports" onClick={() => navigate('/admin/issues')}>
-                  <List className="w-4 h-4" />
-                  All Reports
+                <SidebarMenuButton tooltip="All Reports" onClick={() => navigate('/admin/issues')} className="h-12 hover:scale-105 hover:shadow-lg transition-transform duration-200">
+                  <List className="w-5 h-5" />
+                  <span className="text-base">All Reports</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Analytics" isActive>
-                  <BarChart3 className="w-4 h-4" />
-                  Analytics
+                <SidebarMenuButton tooltip="Analytics" isActive className="h-12 hover:scale-105 hover:shadow-lg transition-transform duration-200">
+                  <BarChart3 className="w-5 h-5" />
+                  <span className="text-base">Analytics</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-2 cursor-pointer p-2 rounded-md hover:bg-muted">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                  <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">Admin User</span>
-                  <span className="text-xs text-muted-foreground">admin@CiviLink.com</span>
-                </div>
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 mb-2" side="top" align="start">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <UserIcon className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <UserMenu />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
@@ -318,7 +284,7 @@ const AnalyticsContent = () => {
         </header>
         <main className="p-4 sm:px-6 sm:py-0">
           <div className="space-y-6">
-            <Card>
+            <Card style={chartCardStyle}>
               <CardHeader>
                 <CardTitle>Monthly Reports Overview</CardTitle>
               </CardHeader>
@@ -328,7 +294,7 @@ const AnalyticsContent = () => {
             </Card>
 
             <div className="grid md:grid-cols-2 gap-6">
-              <Card>
+              <Card style={chartCardStyle}>
                 <CardHeader>
                   <CardTitle>Issue Category Distribution</CardTitle>
                 </CardHeader>
@@ -337,7 +303,7 @@ const AnalyticsContent = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card style={chartCardStyle}>
                 <CardHeader>
                   <CardTitle>Average Resolution Time by Category</CardTitle>
                 </CardHeader>
@@ -347,7 +313,7 @@ const AnalyticsContent = () => {
               </Card>
             </div>
             
-            <Card>
+            <Card style={chartCardStyle}>
               <CardHeader>
                 <CardTitle>Top 10 Report Hotspots</CardTitle>
               </CardHeader>
