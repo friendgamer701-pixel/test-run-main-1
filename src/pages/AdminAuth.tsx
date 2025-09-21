@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,8 +16,14 @@ const AdminAuth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated, loading: authLoading } = useAuth();
   const { setAsAdmin } = useAdminRole();
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate("/admin", { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -47,7 +53,7 @@ const AdminAuth = () => {
         toast.success("Login Successful", {
           description: "Welcome back, admin!",
         });
-        navigate("/admin");
+        // Navigation is now handled by useEffect
       } else {
         await supabase.auth.signOut();
         throw new Error("You are not authorized to access this page.");
@@ -64,6 +70,14 @@ const AdminAuth = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  if (authLoading || isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div>Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/40">

@@ -61,6 +61,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import IssueSkeleton from "@/components/IssueSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Issue {
   id: number;
@@ -332,7 +334,7 @@ const IssuesManagement = () => {
     return null;
   };
 
-  if (adminLoading || loading) {
+  if (adminLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">Loading issues management...</div>
@@ -576,174 +578,177 @@ const IssuesManagement = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredIssues.map((issue) => (
-                  <TableRow key={issue.id} className={issue.is_spam ? "opacity-50" : ""}>
-                    <TableCell>
-                      <div className="space-y-2">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="font-medium flex items-center gap-2">
-                              {issue.title}
-                              {issue.is_spam && <Badge variant="destructive" className="text-xs">SPAM</Badge>}
-                              {issue.duplicate_of && <Badge variant="outline" className="text-xs">DUPLICATE</Badge>}
+                {loading ? (
+                  Array.from({ length: 10 }).map((_, index) => <IssueSkeleton key={index} />)
+                ) : filteredIssues.length > 0 ? (
+                  filteredIssues.map((issue) => (
+                    <TableRow key={issue.id} className={issue.is_spam ? "opacity-50" : ""}>
+                      <TableCell>
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="font-medium flex items-center gap-2">
+                                {issue.title}
+                                {issue.is_spam && <Badge variant="destructive" className="text-xs">SPAM</Badge>}
+                                {issue.duplicate_of && <Badge variant="outline" className="text-xs">DUPLICATE</Badge>}
+                              </div>
+                              <div className="text-sm text-muted-foreground line-clamp-2">
+                                {issue.description}
+                              </div>
                             </div>
-                            <div className="text-sm text-muted-foreground line-clamp-2">
-                              {issue.description}
+                            <div className="text-right">
+                              <div className="text-lg font-semibold text-primary">
+                                {issue.priority_score}
+                              </div>
+                              <div className="text-xs text-muted-foreground">Priority</div>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="text-lg font-semibold text-primary">
-                              {issue.priority_score}
+                          
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1 text-blue-600">
+                              <ThumbsUp className="h-3 w-3" />
+                              <span className="text-sm font-medium">{issue.upvotes_count}</span>
+                              <span className="text-xs text-muted-foreground">upvotes</span>
                             </div>
-                            <div className="text-xs text-muted-foreground">Priority</div>
+                            {issue.assigned_to && (
+                              <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                Assigned: {issue.assigned_to}
+                              </div>
+                            )}
                           </div>
                         </div>
-                        
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1 text-blue-600">
-                            <ThumbsUp className="h-3 w-3" />
-                            <span className="text-sm font-medium">{issue.upvotes_count}</span>
-                            <span className="text-xs text-muted-foreground">upvotes</span>
-                          </div>
-                          {issue.assigned_to && (
-                            <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                              Assigned: {issue.assigned_to}
+                      </TableCell>
+                      
+                      <TableCell>
+                        <Badge variant="outline">{issue.category}</Badge>
+                      </TableCell>
+                      
+                      <TableCell>
+                        <div className="space-y-2">
+                          <Badge variant={getStatusBadgeVariant(issue.status)} className="gap-1">
+                            {getStatusIcon(issue.status)}
+                            {issue.status.replace('_', ' ')}
+                          </Badge>
+                          {issue.response_time && (
+                            <div className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                              Resolved in: {issue.response_time}
+                            </div>
+                          )}
+                          {issue.public_notes && (
+                            <div className="text-xs bg-gray-50 p-2 rounded">
+                              <strong>Update:</strong> {issue.public_notes}
                             </div>
                           )}
                         </div>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <Badge variant="outline">{issue.category}</Badge>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="space-y-2">
-                        <Badge variant={getStatusBadgeVariant(issue.status)} className="gap-1">
-                          {getStatusIcon(issue.status)}
-                          {issue.status.replace('_', ' ')}
-                        </Badge>
-                        {issue.response_time && (
-                          <div className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
-                            Resolved in: {issue.response_time}
-                          </div>
-                        )}
-                        {issue.public_notes && (
-                          <div className="text-xs bg-gray-50 p-2 rounded">
-                            <strong>Update:</strong> {issue.public_notes}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex items-center gap-1 text-sm">
-                        <MapPin className="h-3 w-3" />
-                        <span className="truncate max-w-[120px]">
-                          {issue.location_name || `${issue.latitude}, ${issue.longitude}`}
-                        </span>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      {issue.image_url ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setSelectedImage(issue.image_url)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Image className="h-4 w-4" />
-                        </Button>
-                      ) : (
-                        <span className="text-muted-foreground text-sm">No image</span>
-                      )}
-                    </TableCell>
-                    
-                    <TableCell className="text-sm">
-                      <div>
-                        <div className="font-medium">
-                          {formatDistanceToNow(new Date(issue.created_at), { addSuffix: true })}
+                      </TableCell>
+                      
+                      <TableCell>
+                        <div className="flex items-center gap-1 text-sm">
+                          <MapPin className="h-3 w-3" />
+                          <span className="truncate max-w-[120px]">
+                            {issue.location_name || `${issue.latitude}, ${issue.longitude}`}
+                          </span>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          ID: #{issue.id}
-                        </div>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
+                      </TableCell>
+                      
+                      <TableCell>
+                        {issue.image_url ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedImage(issue.image_url)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Image className="h-4 w-4" />
                           </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuLabel>Status Management</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => handleStatusChange(issue.id, "new")}
-                          >
-                            <AlertTriangle className="h-4 w-4 mr-2" />
-                            Mark as New
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleStatusChange(issue.id, "in_progress")}
-                          >
-                            <Clock className="h-4 w-4 mr-2" />
-                            Mark as In Progress
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleStatusChange(issue.id, "resolved")}
-                          >
-                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                            Mark as Resolved
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          
-                          <DropdownMenuLabel>Moderation</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => handleSpamToggle(issue.id, !issue.is_spam)}
-                            className={issue.is_spam ? "text-green-600" : "text-red-600"}
-                          >
-                            <Shield className="h-4 w-4 mr-2" />
-                            {issue.is_spam ? "Unmark as Spam" : "Mark as Spam"}
-                          </DropdownMenuItem>
-                          
-                          <DropdownMenuItem
-                            onClick={() => {
-                              const assignTo = prompt("Assign to (enter name):");
-                              if (assignTo) handleAssignIssue(issue.id, assignTo);
-                            }}
-                          >
-                            <Users className="h-4 w-4 mr-2" />
-                            Assign Issue
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => window.open(`https://maps.google.com/?q=${issue.latitude},${issue.longitude}`, '_blank')}
-                          >
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            View on Map
-                          </DropdownMenuItem>
-                          
-                          <DropdownMenuItem
-                            onClick={() => {
-                              navigator.clipboard.writeText(`Issue #${issue.id}: ${issue.title}`);
-                              toast({ title: "Copied to clipboard" });
-                            }}
-                          >
-                            <Copy className="h-4 w-4 mr-2" />
-                            Copy Issue Link
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {filteredIssues.length === 0 && (
+                        ) : (
+                          <span className="text-muted-foreground text-sm">No image</span>
+                        )}
+                      </TableCell>
+                      
+                      <TableCell className="text-sm">
+                        <div>
+                          <div className="font-medium">
+                            {formatDistanceToNow(new Date(issue.created_at), { addSuffix: true })}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            ID: #{issue.id}
+                          </div>
+                        </div>
+                      </TableCell>
+                      
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-56">
+                            <DropdownMenuLabel>Status Management</DropdownMenuLabel>
+                            <DropdownMenuItem
+                              onClick={() => handleStatusChange(issue.id, "new")}
+                            >
+                              <AlertTriangle className="h-4 w-4 mr-2" />
+                              Mark as New
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleStatusChange(issue.id, "in_progress")}
+                            >
+                              <Clock className="h-4 w-4 mr-2" />
+                              Mark as In Progress
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleStatusChange(issue.id, "resolved")}
+                            >
+                              <CheckCircle2 className="h-4 w-4 mr-2" />
+                              Mark as Resolved
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            
+                            <DropdownMenuLabel>Moderation</DropdownMenuLabel>
+                            <DropdownMenuItem
+                              onClick={() => handleSpamToggle(issue.id, !issue.is_spam)}
+                              className={issue.is_spam ? "text-green-600" : "text-red-600"}
+                            >
+                              <Shield className="h-4 w-4 mr-2" />
+                              {issue.is_spam ? "Unmark as Spam" : "Mark as Spam"}
+                            </DropdownMenuItem>
+                            
+                            <DropdownMenuItem
+                              onClick={() => {
+                                const assignTo = prompt("Assign to (enter name):");
+                                if (assignTo) handleAssignIssue(issue.id, assignTo);
+                              }}
+                            >
+                              <Users className="h-4 w-4 mr-2" />
+                              Assign Issue
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem
+                              onClick={() => window.open(`https://maps.google.com/?q=${issue.latitude},${issue.longitude}`, '_blank')}
+                            >
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              View on Map
+                            </DropdownMenuItem>
+                            
+                            <DropdownMenuItem
+                              onClick={() => {
+                                navigator.clipboard.writeText(`Issue #${issue.id}: ${issue.title}`);
+                                toast({ title: "Copied to clipboard" });
+                              }}
+                            >
+                              <Copy className="h-4 w-4 mr-2" />
+                              Copy Issue Link
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                       {issues.length === 0 ? "No issues reported yet." : "No issues match the current filters."}

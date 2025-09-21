@@ -11,13 +11,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, Settings, User as UserIcon } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth.tsx";
 
 export const UserMenu: React.FC = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/");
+    logout();
+    navigate("/admin-login");
   };
 
   return (

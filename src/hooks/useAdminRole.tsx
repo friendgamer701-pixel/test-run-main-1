@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth.tsx';
 
 interface AdminContextType {
   isAdmin: boolean;
@@ -12,23 +13,36 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined);
 export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated } = useAuth(); // Consume auth context
 
   useEffect(() => {
-    const storedIsAdmin = sessionStorage.getItem('isAdmin');
-    if (storedIsAdmin) {
-      setIsAdmin(JSON.parse(storedIsAdmin));
+    try {
+        const storedIsAdmin = localStorage.getItem('isAdmin');
+        if (storedIsAdmin) {
+          setIsAdmin(JSON.parse(storedIsAdmin));
+        }
+    } catch (error) {
+        console.error("Error reading from localStorage", error);
+    } finally {
+        setLoading(false);
     }
-    setLoading(false);
   }, []);
+
+  // Effect to sync with auth state
+  useEffect(() => {
+    if (!isAuthenticated) {
+      unsetAsAdmin();
+    }
+  }, [isAuthenticated]);
 
   const setAsAdmin = () => {
     setIsAdmin(true);
-    sessionStorage.setItem('isAdmin', JSON.stringify(true));
+    localStorage.setItem('isAdmin', JSON.stringify(true));
   };
 
   const unsetAsAdmin = () => {
     setIsAdmin(false);
-    sessionStorage.removeItem('isAdmin');
+    localStorage.removeItem('isAdmin');
   };
 
   return (

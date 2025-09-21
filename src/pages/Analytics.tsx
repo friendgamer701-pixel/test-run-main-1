@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Tables } from "@/integrations/supabase/types";
 import { UserMenu } from "@/components/UserMenu";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Types for our data
 type Issue = Tables<"issues">;
@@ -252,20 +253,14 @@ const AnalyticsContent = () => {
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-full">
-      <div>Loading analytics...</div>
-    </div>
-  );
-
   return (
     <>
       <Sidebar variant="inset" collapsible="icon">
         <SidebarHeader>
-          <div className="flex items-center gap-3 p-2">
+          <button onClick={() => navigate('/')} className="flex items-center gap-3 p-2">
             <Shield className="w-8 h-8 text-primary" />
             <span className="text-2xl font-semibold">CiviLink</span>
-          </div>
+          </button>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
@@ -301,45 +296,84 @@ const AnalyticsContent = () => {
           <SidebarTrigger className="sm:hidden flex-shrink-0" />
         </header>
         <main className="p-4 sm:px-6 sm:py-0">
-          <div className="space-y-6">
-            <Card style={chartCardStyle}>
-              <CardHeader>
-                <CardTitle>Monthly Reports Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <MonthlyReportsChart data={monthlyData} />
-              </CardContent>
-            </Card>
-
-            <div className="grid md:grid-cols-2 gap-6">
+          {loading ? (
+            <div className="space-y-6">
               <Card style={chartCardStyle}>
                 <CardHeader>
-                  <CardTitle>Issue Category Distribution</CardTitle>
+                  <Skeleton className="h-6 w-1/2" />
                 </CardHeader>
                 <CardContent>
-                  <CategoryDistributionChart data={categoryData} />
+                  <Skeleton className="h-[300px] w-full" />
                 </CardContent>
               </Card>
-
+              <div className="grid md:grid-cols-2 gap-6">
+                <Card style={chartCardStyle}>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-3/4" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-[300px] w-full" />
+                  </CardContent>
+                </Card>
+                <Card style={chartCardStyle}>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-3/4" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-[300px] w-full" />
+                  </CardContent>
+                </Card>
+              </div>
               <Card style={chartCardStyle}>
                 <CardHeader>
-                  <CardTitle>Reports by Day of the Week</CardTitle>
+                  <Skeleton className="h-6 w-1/2" />
                 </CardHeader>
                 <CardContent>
-                  <ReportsByDayChart data={reportsByDayData} />
+                  <Skeleton className="h-[300px] w-full" />
                 </CardContent>
               </Card>
             </div>
-            
-            <Card style={chartCardStyle}>
-              <CardHeader>
-                <CardTitle>Top 10 Report Hotspots</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <LocationHotspotsChart data={locationData} />
-              </CardContent>
-            </Card>
-          </div>
+          ) : (
+            <div className="space-y-6">
+              <Card style={chartCardStyle}>
+                <CardHeader>
+                  <CardTitle>Monthly Reports Overview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <MonthlyReportsChart data={monthlyData} />
+                </CardContent>
+              </Card>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <Card style={chartCardStyle}>
+                  <CardHeader>
+                    <CardTitle>Issue Category Distribution</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CategoryDistributionChart data={categoryData} />
+                  </CardContent>
+                </Card>
+
+                <Card style={chartCardStyle}>
+                  <CardHeader>
+                    <CardTitle>Reports by Day of the Week</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ReportsByDayChart data={reportsByDayData} />
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <Card style={chartCardStyle}>
+                <CardHeader>
+                  <CardTitle>Top 10 Report Hotspots</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <LocationHotspotsChart data={locationData} />
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </main>
       </SidebarInset>
     </>
