@@ -78,7 +78,16 @@ export const ReportModal = ({ isOpen, onClose }: ReportModalProps) => {
       return;
     }
 
-    if (!category || !description || !title || !photo || !streetAddress || !landmark) {
+    if (!photo) {
+      toast({
+        title: "Photo Required",
+        description: "Please upload a photo of the issue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!title || !category || !description || !streetAddress || !landmark) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -153,7 +162,7 @@ export const ReportModal = ({ isOpen, onClose }: ReportModalProps) => {
               <Label htmlFor="title">Title *</Label>
               <div className="relative">
                 <ClipboardList className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Large pothole on Elm St" required className="pl-10" />
+                <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Large pothole on Elm St" className="pl-10" />
               </div>
             </div>
 
@@ -161,7 +170,7 @@ export const ReportModal = ({ isOpen, onClose }: ReportModalProps) => {
               <Label htmlFor="category">Issue Category *</Label>
               <div className="relative">
                 <LayoutGrid className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Select value={category} onValueChange={setCategory} required>
+                <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger className="pl-10">
                     <SelectValue placeholder="Select a category..." />
                   </SelectTrigger>
@@ -177,14 +186,14 @@ export const ReportModal = ({ isOpen, onClose }: ReportModalProps) => {
             <Label htmlFor="description">Description *</Label>
             <div className="relative">
               <MessageSquare className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the issue in detail..." required className="pl-10 pt-2" />
+              <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the issue in detail..." className="pl-10 pt-2" />
             </div>
           </div>
 
           <div className="space-y-2">
             <Label>Upload a Photo *</Label>
             <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
-              <input type="file" id="photo" accept="image/*" onChange={handlePhotoChange} className="hidden" required />
+              <input type="file" id="photo" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               <label htmlFor="photo" className="cursor-pointer w-full flex flex-col items-center">
                 {photo ? (
                   <div className="text-center space-y-2">
@@ -208,14 +217,14 @@ export const ReportModal = ({ isOpen, onClose }: ReportModalProps) => {
               <Label htmlFor="streetAddress">Street Address *</Label>
               <div className="relative">
                 <Map className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="streetAddress" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="e.g., 123 Main St" required className="pl-10" />
+                <Input id="streetAddress" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="e.g., 123 Main St" className="pl-10" />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="landmark">Landmark *</Label>
               <div className="relative">
                 <Star className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="landmark" value={landmark} onChange={(e) => setLandmark(e.target.value)} placeholder="e.g., Near the old oak tree" required className="pl-10" />
+                <Input id="landmark" value={landmark} onChange={(e) => setLandmark(e.target.value)} placeholder="e.g., Near the old oak tree" className="pl-10" />
               </div>
             </div>
           </div>
