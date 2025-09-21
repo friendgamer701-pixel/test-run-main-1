@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MapPin, Upload, X, ClipboardList, LayoutGrid, MessageSquare, Map, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Checkbox } from "./ui/checkbox";
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -34,6 +35,7 @@ export const ReportModal = ({ isOpen, onClose }: ReportModalProps) => {
   const [title, setTitle] = useState("");
   const [streetAddress, setStreetAddress] = useState("");
   const [landmark, setLandmark] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [location, setLocation] = useState<{ lat: number; lng: number; name: string } | null>(null);
   const { toast } = useToast();
 
@@ -96,6 +98,15 @@ export const ReportModal = ({ isOpen, onClose }: ReportModalProps) => {
       return;
     }
 
+    if (!agreedToTerms) {
+      toast({
+        title: "Terms and Conditions",
+        description: "You must agree to the terms and conditions to submit a report.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -132,6 +143,7 @@ export const ReportModal = ({ isOpen, onClose }: ReportModalProps) => {
       setLandmark("");
       setPhoto(null);
       setLocation(null);
+      setAgreedToTerms(false);
       setIsSubmitting(false);
       onClose();
     } catch (error) {
@@ -235,6 +247,16 @@ export const ReportModal = ({ isOpen, onClose }: ReportModalProps) => {
               <MapPin className="w-5 h-5 text-primary" />
               <span className="text-sm font-medium text-muted-foreground">{location ? location.name : "Detecting location..."}</span>
             </div>
+          </div>
+
+          <div className="items-center flex space-x-2">
+            <Checkbox id="terms" checked={agreedToTerms} onCheckedChange={(checked) => setAgreedToTerms(Boolean(checked))} />
+            <label
+              htmlFor="terms"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              style={{ color: "red" }}
+            >Upload only real photos of the issue. Misleading or irrelevant uploads may result in action being taken against you.
+            </label>
           </div>
 
           <div className="flex gap-4 pt-4">
