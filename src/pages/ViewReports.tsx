@@ -6,12 +6,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, Image, Search, TrendingUp, Filter, Eye, Download } from "lucide-react";
+import { MapPin, Calendar, Image, Search, TrendingUp, Filter, Eye, Download, Home } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { IssueUpvote } from "@/components/IssueUpvote";
 import { useToast } from "@/hooks/use-toast";
 import * as XLSX from 'xlsx';
 import heroImage from "@/assets/hero-cityscape.jpg";
+import { Link } from "react-router-dom";
 
 const ViewReports: React.FC = () => {
   const [reports, setReports] = useState<any[]>([]);
@@ -152,6 +153,13 @@ const ViewReports: React.FC = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
+      <div className="absolute top-4 left-4 z-10">
+        <Button variant="outline" size="icon" asChild>
+          <Link to="/">
+            <Home className="h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
       {/* Hero Section */}
       <div className="relative bg-cover bg-center h-[300px]" style={{ backgroundImage: `url(${heroImage})` }}>
         <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center px-4">

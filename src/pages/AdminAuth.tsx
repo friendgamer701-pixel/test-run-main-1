@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
-import { Shield, Eye, EyeOff } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Home } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth.tsx";
 import { useAdminRole } from "@/hooks/useAdminRole.tsx";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import CiviLinkLogo from "@/assets/logo.png";
 
 const AdminAuth = () => {
   const [email, setEmail] = useState("");
@@ -81,12 +82,17 @@ const AdminAuth = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/40">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
+      <Card className="relative w-full max-w-md">
+        <div className="absolute top-4 left-4">
+          <Button variant="outline" size="icon" asChild>
+            <Link to="/">
+              <Home className="h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+        <CardHeader className="text-center space-y-4 pt-16">
           <div className="flex justify-center">
-            <div className="rounded-full bg-primary/10 p-3">
-              <Shield className="w-8 h-8 text-primary" />
-            </div>
+            <img src={CiviLinkLogo} alt="CiviLink Logo" className="w-20" />
           </div>
           <CardTitle className="text-3xl font-bold">Admin Portal</CardTitle>
           <CardDescription>

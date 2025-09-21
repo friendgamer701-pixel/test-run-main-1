@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Home, List, BarChart3, Activity } from 'lucide-react';
 import { DashboardOverview } from "@/components/DashboardOverview";
-import { useNavigate } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { UserMenu } from "@/components/UserMenu";
 import logo from "@/assets/logo.png";
 
@@ -32,8 +32,11 @@ const AdminDashboardContent: React.FC = () => {
       <Sidebar variant="inset" collapsible="icon">
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
+            <Link to="/">                     
             <img src={logo} alt="CiviLink Logo" className="w-8 h-8" />
-            <span className="text-2xl font-semibold">CiviLink</span>
+            </Link>
+            <Link to="/">  
+            <span className="text-2xl font-semibold">CiviLink</span></Link>
           </div>
         </SidebarHeader>
         <SidebarContent>
