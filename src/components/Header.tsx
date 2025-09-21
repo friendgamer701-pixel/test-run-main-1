@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Menu, X } from "lucide-react";
 import { ReportModal } from "./ReportModal";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,7 +36,7 @@ export const Header = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-2">
-            <img src="src/assets/logo.png" width="32" ></img>
+            <img src={logo} width="32" ></img>
               CiviLink
             </Link>
             

@@ -8,7 +8,7 @@ import {
 import {
   Sidebar, SidebarProvider, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarHeader, SidebarFooter, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Home, List, BarChart3, Shield } from 'lucide-react';
+import { Home, List, BarChart3 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import type { Tables } from "@/integrations/supabase/types";
 import { UserMenu } from "@/components/UserMenu";
 import { Skeleton } from "@/components/ui/skeleton";
+import logo from "@/assets/logo.png";
 
 // Types for our data
 type Issue = Tables<"issues">;
@@ -257,10 +258,10 @@ const AnalyticsContent = () => {
     <>
       <Sidebar variant="inset" collapsible="icon">
         <SidebarHeader>
-          <button onClick={() => navigate('/')} className="flex items-center gap-3 p-2">
-            <Shield className="w-8 h-8 text-primary" />
+          <div className="flex items-center gap-2 p-2">
+            <img src={logo} alt="CiviLink Logo" className="w-8 h-8" />
             <span className="text-2xl font-semibold">CiviLink</span>
-          </button>
+          </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>

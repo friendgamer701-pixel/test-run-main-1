@@ -11,6 +11,7 @@ import { formatDistanceToNow } from "date-fns";
 import { IssueUpvote } from "@/components/IssueUpvote";
 import { useToast } from "@/hooks/use-toast";
 import * as XLSX from 'xlsx';
+import heroImage from "@/assets/hero-cityscape.jpg";
 
 const ViewReports: React.FC = () => {
   const [reports, setReports] = useState<any[]>([]);
@@ -152,7 +153,7 @@ const ViewReports: React.FC = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Hero Section */}
-      <div className="relative bg-cover bg-center h-[300px]" style={{ backgroundImage: "url('/src/assets/hero-cityscape.jpg')" }}>
+      <div className="relative bg-cover bg-center h-[300px]" style={{ backgroundImage: `url(${heroImage})` }}>
         <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center px-4">
           <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3 flex items-center gap-3">
             <Eye className="h-10 w-10 md:h-12 md:w-12" />

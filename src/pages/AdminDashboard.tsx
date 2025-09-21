@@ -13,10 +13,11 @@ import {
   SidebarGroupLabel,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Home, List, BarChart3, Shield, Activity } from 'lucide-react';
+import { Home, List, BarChart3, Activity } from 'lucide-react';
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { useNavigate } from "react-router-dom";
 import { UserMenu } from "@/components/UserMenu";
+import logo from "@/assets/logo.png";
 
 const AdminDashboardContent: React.FC = () => {
   const navigate = useNavigate();
@@ -30,8 +31,8 @@ const AdminDashboardContent: React.FC = () => {
     <>
       <Sidebar variant="inset" collapsible="icon">
         <SidebarHeader>
-          <div className="flex items-center gap-3 p-2">
-            <Shield className="w-8 h-8 text-primary" />
+          <div className="flex items-center gap-2 p-2">
+            <img src={logo} alt="CiviLink Logo" className="w-8 h-8" />
             <span className="text-2xl font-semibold">CiviLink</span>
           </div>
         </SidebarHeader>
