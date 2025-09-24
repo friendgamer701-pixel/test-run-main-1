@@ -205,7 +205,7 @@ export const ReportModal = ({ isOpen, onClose }: ReportModalProps) => {
           <div className="space-y-2">
             <Label>Upload a Photo *</Label>
             <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
-              <input type="file" id="photo" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+              <input type="file" id="photo" accept="image/*" capture="environment" onChange={handlePhotoChange} className="hidden" />
               <label htmlFor="photo" className="cursor-pointer w-full flex flex-col items-center">
                 {photo ? (
                   <div className="text-center space-y-2">
